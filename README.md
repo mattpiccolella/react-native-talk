@@ -233,12 +233,6 @@ AppRegistry.registerComponent('GithubFinder', () => GithubFinder);
 
 The code, while it may look familiar in some aspects, has lots of concepts, which will represent most of our work here. The next section will attempt to explain each of the concepts present in this file.
 
--   [2.0 The Basics of React](#basics)
-    - [2.1 Components](#components)
-    - [2.2 `render`](#render)
-    - [2.3 Styling](#simulator)
-    - [2.4 `AppRegistry`](#app-registry)
-
 <a id="basics"></a>
 ## 2.0 The Basics of React
 In this section, we will disect our `index.ios.js` file to understand each of the parts that makes up a React application.
