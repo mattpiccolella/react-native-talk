@@ -41,11 +41,16 @@ This document contains a series of several sections, each of which explains a ce
     - [2.3 Styling](#styling)
     - [2.4 `AppRegistry`](#app-registry)
     - [2.5 Changing our Component](#changing-comp)
--   [3.0 Our First Component](#first-component)
-    - [2.1 Components](#components)
-    - [2.2 `render`](#render)
-    - [2.3 Styling](#styling)
-    - [2.4 `AppRegistry`](#app-registry)
+-   [3.0 Search Bar and Data Retrieval](#build-application)
+    - [3.1 Adding our Search Bar](#search-bar)
+    - [3.2 Delegate Methods](#delegate)
+    - [3.3 Retrieving our Data](#retrieving-data)
+-   [4.0 Showing our Results](#results)
+    - [4.1 Component State](#component-state)
+    - [4.2 Creating our List View](#list-view)
+    - [4.3 Creating Each Cell](#cells)
+    - [4.4 Styling Each Cell](#styling-cell)
+-   [Conclusion](#conclusion)
 -   [Additional Resources](#additionalresources)
 
 
@@ -347,7 +352,7 @@ Now that we understand our component, let's change it!
 
 Change `render` to look as follows:
 
-```
+```javascript
 render: function() {
   return (
     <View style={styles.container}>
@@ -445,6 +450,507 @@ and our application will look as follows:
 ![Custom View](https://dl.dropboxusercontent.com/s/sp5s2goau3ucaa9/first-view.png)
 
 Woohoo! You have now created your first custom view.
+
+-   [3.0 Search Bar and Data Retrieval](#build-application)
+    - [3.1 Adding our Search Bar](#search-bar)
+    - [3.2 Delegate Methods](#delegate)
+    - [3.3 Retrieving our Data](#retrieving-data)
+-   [4.0 Showing our Results](#results)
+    - [4.1 Creating our List View](#list-view)
+    - [4.2 Creating Each Cell](#cells)
+    - [4.3 Styling Each Cell](#styling-cell)
+
+<a id="build-application"></a>
+## 3.0 Search Bar and Data Retrieval
+Now we are going to work on getting our data. To do this, we will use the GitHub API, which is pretty simple and easy to get the hang of. Let's begin.
+
+<a id="search-bar"></a>
+### 3.1 Adding our Search Bar
+First, we need to add our search bar. We'll do this by adding a simple `TextInput` and adding some styling. Change your `render` method to the following:
+
+```javascript
+render: function() {
+  return (
+    <View style={styles.container}>
+      <TextInput
+        autoCapitalize="none"
+        autoCorrect={false}
+        placeholder="Search for a project..."
+        style={styles.searchBarInput}
+      />
+    </View>
+  );
+}
+```
+
+We basically create a `TextInput` object with several different attributes: we don't want our words to autocapitalize or autocorrect, we add a placeholder text, and some styles, which are as follows:
+
+```javascript
+var styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  searchBarInput: {
+    marginTop: 30,
+    padding: 5,
+    fontSize: 15,
+    flex: 1,
+    height: 30,
+    backgroundColor: '#EAEAEA',
+  },
+});
+```
+
+We change the background color of our `TextInput` to make it more visible, set its height and top margin, give it some padding, and we're done. The completed view looks like this:
+
+![Search Bar](https://dl.dropboxusercontent.com/s/0daztpubink5xqz/searchbar.png)
+
+<a id="delegate"></a>
+### 3.2 Delegate Methods
+Now, we want to be able to search for our API whenever a user types into the search bar. To do this, we need to use a **delegate method**. Essentially what this means is that we want a certain function to be called after some action, in this case whenever the user stops typing in the search bar. To do that, we simply set the property `onEndEditing` on the text input, as follows:
+
+```javascript
+<TextInput
+  autoCapitalize="none"
+  autoCorrect={false}
+  placeholder="Search for a project..."
+  style={styles.searchBarInput}
+  onEndEditing={this.onSearchChange}
+/>
+```
+
+We have not yet implemented this function to actually query the GitHub API to get our data on the search change, but we will do that next.
+
+<a id="retrieving-data"></a>
+### 3.3 Retrieving our Data
+So, now we must implement our function `onSearchChange` to query the GitHub API for our results. Let's implement that as follows:
+
+```javascript
+var BASE_URL = 'https://api.github.com/search/repositories?q=';
+...
+var GithubFinder = React.createClass({
+...
+  onSearchChange: function(event: Object) {
+    var searchTerm = event.nativeEvent.text.toLowerCase();
+
+    var queryURL = BASE_URL + encodeURIComponent(searchTerm);
+    fetch(queryURL)
+      .then((response) => response.json())
+      .then((responseData) => {
+        if (responseData.items) {
+          this.setState({
+            dataSource: this.state.dataSource.cloneWithRows(responseData.items),
+          });
+        }
+    })
+    .done();
+  },
+});
+```
+
+Inside of our function, we create our URL by appending the text that was typed into the search bar. Then, we use our `fetch` method to find the results of the API call, then once we have the data available, we set the state of our component to include our data source. However, we also check that our items exist; we could have a blank response or an error response which would make us not want to change the data source. We will talk more about the data source line in our next section, but essentially what it does it store the data so we will be able to access it later.
+
+Now, we are done with the data retrieval part of our app! Let's move on to presenting it.
+
+Our code thus far looks as follows:
+
+```javascript
+'use strict';
+
+var React = require('react-native');
+
+var BASE_URL = "https://api.github.com/search/repositories?q=";
+
+var {
+  AppRegistry,
+  Image,
+  ListView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} = React;
+
+var GithubFinder = React.createClass({
+  render: function() {
+    return (
+      <View style={styles.container}>
+        <TextInput
+          autoCapitalize="none"
+          autoCorrect={false}
+          placeholder="Search for a project..."
+          style={styles.searchBarInput}
+          onEndEditing={this.onSearchChange}
+        />
+      </View>
+    );
+  },
+  onSearchChange: function(event: Object) {
+    var searchTerm = event.nativeEvent.text.toLowerCase();
+
+    var queryURL = BASE_URL + encodeURIComponent(searchTerm);
+    fetch(queryURL)
+      .then((response) => response.json())
+      .then((responseData) => {
+      if (responseData.items) {
+        this.setState({
+          dataSource: this.state.dataSource.cloneWithRows(responseData.items),
+        });
+      }
+    })
+    .done();
+  },
+});
+
+var styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  searchBarInput: {
+    marginTop: 30,
+    padding: 5,
+    fontSize: 15,
+    flex: 1,
+    height: 30,
+    backgroundColor: '#EAEAEA',
+  },
+});
+
+AppRegistry.registerComponent('GithubFinder', () => GithubFinder);
+```
+
+
+<a id="results"></a>
+## 4.0 Showing our Results
+Now that we have our data, let's work on presenting it in the form of a list view. In this list view, each row will correspond to a different repository that was returned by our search to GitHub. Let's do it!
+
+<a id="component-state"></a>
+### 4.1 Component State
+In the previous section, we called the method `this.setState`. An important aspect of React that we haven't yet introduced is that each Component has its own **state**, which represents some data we can store about a component. In this case, we want to store a data source, which is the data that our list view will present. When our component is first rendered, we want to set an initial state, which we do using the method `getInitialState`. Let's implement it as follows:
+
+```javascript
+var GithubFinder = React.createClass({
+...
+  getInitialState: function() {
+    return {
+      dataSource: new ListView.DataSource({
+        rowHasChanged: (row1, row2) => row1 !== row2,
+      }),
+    };
+  },
+...
+});
+```
+
+**NOTE**: since we are now using `ListView`, we need to add it to our list of components at the top of our file.
+
+In this, we create a blank data source with a single attribute, a function which defines whether a row has changed. Don't worry too much about this; all it does is tell the data source that a row has changed if the two rows aren't equal.
+
+Now that we have set our initial state, our data retrieval method will be able to successfully set the rows of our data source using the GitHub search results.
+
+<a id="list-view"></a>
+### 4.2 Creating our List View
+Now, we need to create our list view to show all the results we have loaded. Let's do that. We can simply add a component to our `render` method as follows:
+
+```javascript
+  render: function() {
+    var content = this.state.dataSource.getRowCount() === 0 ?
+        <Text>
+          Please enter a search term to see results.
+        </Text> :
+        <ListView
+          ref="listview"
+          dataSource={this.state.dataSource}
+          renderRow={this.renderRow}
+          automaticallyAdjustContentInsets={false}
+          keyboardDismissMode="onDrag"
+          keyboardShouldPersistTaps={true}
+          showsVerticalScrollIndicator={true}
+        />;
+    return (
+      <View style={styles.container}>
+        <TextInput
+          autoCapitalize="none"
+          autoCorrect={false}
+          placeholder="Search for a project..."
+          style={styles.searchBarInput}
+          onEndEditing={this.onSearchChange}
+        />
+        {content}
+      </View>
+    );
+  },
+```
+
+Let's look at this piece by piece. First, we add our search bar, just like we did before. Then, we do create a variable, called `content`, which will define what is put next in our view. If our data source doesn't have any rows, meaning we don't have any data results to show, we prompt the user to enter a search term. If, however, we do have search results, then we add a list view. 
+
+Our List View object has several attributes that we must set. One is our data source, the source from which the list will render itself. Next, we provide a method, called `renderRow`, which will render each row in the list; we'll implement that next. Then, we implement several styling keywords that help to define the actions of our `ListView`; there are many different available properties and those can be found in the documentation.
+
+<a id="cells"></a>
+### 4.3 Creating Each Cell
+Now, we want to show row to render each of our rows. We do that by implementing a the method that we placed as our delegate method for rendering rows, `this.renderRow`. We can implement that here:
+
+```javascript
+renderRow: function(repo: Object)  {
+  return (
+    <View>
+      <View style={styles.row}>
+        <Text>
+          {repo.name}
+        </Text>
+      </View>
+      <View style={styles.cellBorder} />
+    </View>
+  );
+},
+```
+
+Here, we create a basic row that shows just the name of the searched-for repository.
+
+We add two rules to our styles, `row` and `cellBorder` to provide the basic rules for our cells:
+
+```javascript
+row: {
+  alignItems: 'center',
+  backgroundColor: 'white',
+  flexDirection: 'row',
+  padding: 5,
+},
+cellBorder: {
+  backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  height: 1,
+  marginLeft: 4,
+},
+```
+
+Now, if we search for an object, we will see our basic results:
+
+![Basic List View](https://dl.dropboxusercontent.com/s/1jg46adqi74g0pb/Screen%20Shot%202015-04-13%20at%201.03.15%20AM.png)
+
+We're almost done with our app!
+
+<a id="styling-cell"></a>
+### 4.4 Styling Each Cell 
+Now, let's add some more detail to our row, and style it so it looks nicer.
+
+First, we're going to add the user's profile image to the row. Next, we're going to add both the user's name and the name of the repository. We will use some style to set one as the title and one as the subtitle. Then, we will create some styling for the container so padding looks correct.
+
+Here's our edited `renderRow` function:
+
+```javascript
+renderRow: function(repo: Object)  {
+  return (
+    <View>
+      <View style={styles.row}>
+        <Image
+          source={{uri: repo.owner.avatar_url}}
+          style={styles.profpic}
+        />
+        <View style={styles.textcontainer}>
+          <Text style={styles.title}>{repo.name}</Text>
+          <Text style={styles.subtitle}>{repo.owner.login}</Text>
+        </View>
+      </View>
+      <View style={styles.cellBorder} />
+    </View>
+  );
+},
+```
+
+Finally, here are all the styles that are newly created:
+
+```javascript
+profpic: {
+  width: 50,
+  height: 50,
+},
+title: {
+  fontSize: 20,
+  marginBottom: 8,
+  fontWeight: 'bold'
+},
+subtitle: {
+  fontSize: 16,
+  marginBottom: 8,
+},
+textcontainer: {
+  paddingLeft: 10,
+},
+```
+
+In addition, we add one more rule to our blank view text, so it looks a little bit nicer if we haven't typed anything yet:
+
+```javascript
+blanktext: {
+    padding: 10,
+    fontSize: 20,
+}
+...
+<Text style={styles.blanktext}>
+  Please enter a search term to see results.
+</Text>
+```
+
+Try typing in a search term and scrolling through; you'll see all your search results looking beautiful!
+
+Our completed app looks as follows:
+
+![Completed App](https://dl.dropboxusercontent.com/s/fx18gw83vh2m3x8/Finished%20App.png)
+
+<a id="conclusion"></a>
+## Conclusion
+Thus, with these final style changes, we have finished our GithubFinder app! 
+
+Our final code looks as follows:
+
+```javascript
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ */
+'use strict';
+
+var React = require('react-native');
+
+var BASE_URL = "https://api.github.com/search/repositories?q=";
+
+var {
+  AppRegistry,
+  Image,
+  ListView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} = React;
+
+var GithubFinder = React.createClass({
+  getInitialState: function() {
+    return {
+      dataSource: new ListView.DataSource({
+        rowHasChanged: (row1, row2) => row1 !== row2,
+      }),
+    };
+  },
+  render: function() {
+    if (this.state.dataSource.getRowCount() === 0) {
+      console.log("YES");
+    }
+    var content = this.state.dataSource.getRowCount() === 0 ?
+        <Text style={styles.blanktext}>
+          Please enter a search term to see results.
+        </Text> :
+        <ListView
+          ref="listview"
+          dataSource={this.state.dataSource}
+          renderRow={this.renderRow}
+          automaticallyAdjustContentInsets={false}
+          keyboardDismissMode="onDrag"
+          keyboardShouldPersistTaps={true}
+          showsVerticalScrollIndicator={false}
+        />;
+    return (
+      <View style={styles.container}>
+        <TextInput
+          autoCapitalize="none"
+          autoCorrect={false}
+          placeholder="Search for a project..."
+          style={styles.searchBarInput}
+          onEndEditing={this.onSearchChange}
+        />
+        {content}
+      </View>
+    );
+  },
+  onSearchChange: function(event: Object) {
+    var searchTerm = event.nativeEvent.text.toLowerCase();
+
+    var queryURL = BASE_URL + encodeURIComponent(searchTerm);
+    fetch(queryURL)
+      .then((response) => response.json())
+      .then((responseData) => {
+        if (responseData.items) {
+          this.setState({
+            dataSource: this.state.dataSource.cloneWithRows(responseData.items),
+          });
+        }
+    })
+    .done();
+  },
+  renderRow: function(repo: Object)  {
+    return (
+      <View>
+        <View style={styles.row}>
+          <Image
+            source={{uri: repo.owner.avatar_url}}
+            style={styles.profpic}
+          />
+          <View style={styles.textcontainer}>
+            <Text style={styles.title}>{repo.name}</Text>
+            <Text style={styles.subtitle}>{repo.owner.login}</Text>
+          </View>
+        </View>
+        <View style={styles.cellBorder} />
+      </View>
+    );
+  },
+});
+
+var styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  searchBarInput: {
+    marginTop: 30,
+    padding: 5,
+    fontSize: 15,
+    height: 30,
+    backgroundColor: '#EAEAEA',
+  },
+  row: {
+    alignItems: 'center',
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    padding: 5,
+  },
+  cellBorder: {
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    height: 1,
+    marginLeft: 4,
+  },
+  profpic: {
+    width: 50,
+    height: 50,
+  },
+  title: {
+    fontSize: 20,
+    marginBottom: 8,
+    fontWeight: 'bold'
+  },
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  textcontainer: {
+    paddingLeft: 10,
+  },
+  blanktext: {
+    padding: 10,
+    fontSize: 20,
+  }
+});
+
+AppRegistry.registerComponent('GithubFinder', () => GithubFinder);
+```
+
+Our application is certainly functional, and demonstrates many of the main concepts of React Native development. We saw the modularity of components, the precision of styling, and the rest of the awesome features that React has to offer.
+
+If you're wanting more concrete examples of projects to work on, check [here][examples]. There are all sorts of demonstrations of cool projects there that will get you working on different parts of application development with React Native. Or, if you're interested in continuing with GithubFinder, try making it so you can tap each list item and see a detail view with some more information, or maybe be able to search by user instead of just by repository.
+
+Now that you have finished this tutorial, we owe you a congratulations! You have officially built your first application using React Native. We hoped you enjoyed the process.
 
 ___________
 
