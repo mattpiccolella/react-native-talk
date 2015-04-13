@@ -7,6 +7,8 @@ Written and developed by [Matt Piccolella](mailto:matthew@adicu.com) and [ADI][a
 
 Credit to [Use React Native][use-react], [Ray Wenderlich][wenderlich], [Facebook Developers][facebook-dev].
 
+**Download the sample code [here][sample-code].**
+
 ## Getting Started: FAQs
 
 ### What is React Native?
@@ -974,5 +976,6 @@ While React Native is still a very new technology, there are still lots of quali
 [github-link]: https://github.com/mjp2220/react-native-talk 
 [xcode]: https://developer.apple.com/xcode/downloads/
 [flexbox]: https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+[sample-code]: https://dl.dropboxusercontent.com/s/bq23bl6xsgkni68/GithubFinder.zip
 
 
