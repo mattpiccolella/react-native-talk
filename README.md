@@ -447,7 +447,7 @@ AppRegistry.registerComponent('GithubFinder', () => GithubFinder);
 
 and our application will look as follows:
 
-![Custom View](https://dl.dropboxusercontent.com/s/sp5s2goau3ucaa9/first-view.png)
+![Custom View](https://dl.dropboxusercontent.com/s/sp5s2goau3ucaa9/first-view.png =x400)
 
 Woohoo! You have now created your first custom view.
 
