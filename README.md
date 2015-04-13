@@ -40,6 +40,12 @@ This document contains a series of several sections, each of which explains a ce
     - [2.2 `render`](#render)
     - [2.3 Styling](#styling)
     - [2.4 `AppRegistry`](#app-registry)
+    - [2.5 Changing our Component](#changing-comp)
+-   [3.0 Our First Component](#first-component)
+    - [2.1 Components](#components)
+    - [2.2 `render`](#render)
+    - [2.3 Styling](#styling)
+    - [2.4 `AppRegistry`](#app-registry)
 -   [Additional Resources](#additionalresources)
 
 
@@ -335,6 +341,110 @@ AppRegistry.registerComponent('GithubFinder', () => GithubFinder);
 
 Our `AppRegistry.registerComponent` method is the way we register our root component. This means that, when the iOS application launches, it will launch our GithubFinder component as the first component that we see when our application starts. Thus, when our application launches, it'll know what to do.This call will generally be the last line of all of our React Native applications, and it is basically just a way to start our application.
 
+<a id="changing-comp"></a>
+### 2.5 Changing our Component
+Now that we understand our component, let's change it!
+
+Change `render` to look as follows:
+
+```
+render: function() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.welcome}>
+        This is my first custom view!
+      </Text>
+      <Image
+        source={{uri : 'http://www.polyvore.com/cgi/img-thing?.out=jpg&size=l&tid=27610859'}}
+        style={styles.thumbnail}
+      />
+    </View>
+  );
+}
+```
+
+Next, change our `styles` object so that it looks like this:
+
+```javascript
+var styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  customimg: {
+    width: 200,
+    height: 200,
+  },
+});
+```
+
+This provides a width and height for the `Image` object we are adding.
+
+One more thing that we have to do is require the `Image` component, which we are now using. We do that by changing our `React` object at the top as follows:
+
+```javascript
+var {
+  AppRegistry,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+} = React;
+```
+
+Now, our application code will look as follows:
+
+```javascript
+'use strict';
+
+var React = require('react-native');
+var {
+  AppRegistry,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+} = React;
+
+var GithubFinder = React.createClass({
+  render: function() {
+    return (
+      <View style={styles.container}>
+        <Text>
+          This is my first custom view!
+        </Text>
+        <Image
+          source={{uri : 'http://www.polyvore.com/cgi/img-thing?.out=jpg&size=l&tid=27610859'}}
+          style={styles.customimg}
+        />
+      </View>
+    );
+  }
+});
+
+var styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  customimg: {
+    width: 200,
+    height: 200,
+  },
+});
+
+AppRegistry.registerComponent('GithubFinder', () => GithubFinder);
+```
+
+and our application will look as follows:
+
+![Custom View](https://dl.dropboxusercontent.com/s/sp5s2goau3ucaa9/first-view.png)
+
+Woohoo! You have now created your first custom view.
 
 ___________
 
