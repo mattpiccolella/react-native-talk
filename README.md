@@ -35,6 +35,11 @@ This document contains a series of several sections, each of which explains a ce
     - [1.2 Using XCode](#using-xcode)
     - [1.3 Using the Simulator](#simulator)
     - [1.4 Project Structure](#project-structure)
+-   [2.0 The Basics of React](#basics)
+    - [2.1 Components](#components)
+    - [2.2 `render`](#render)
+    - [2.3 Styling](#styling)
+    - [2.4 `AppRegistry`](#app-registry)
 -   [Additional Resources](#additionalresources)
 
 
@@ -214,6 +219,122 @@ AppRegistry.registerComponent('GithubFinder', () => GithubFinder);
 
 The code, while it may look familiar in some aspects, has lots of concepts, which will represent most of our work here. The next section will attempt to explain each of the concepts present in this file.
 
+-   [2.0 The Basics of React](#basics)
+    - [2.1 Components](#components)
+    - [2.2 `render`](#render)
+    - [2.3 Styling](#simulator)
+    - [2.4 `AppRegistry`](#app-registry)
+
+<a id="basics"></a>
+## 2.0 The Basics of React
+In this section, we will disect our `index.ios.js` file to understand each of the parts that makes up a React application.
+
+<a id="components"></a>
+### 2.1 Components
+To start, we can look at the section of the code that looks as follows:
+
+```javascript
+var {
+  AppRegistry,
+  StyleSheet,
+  Text,
+  View,
+} = React;
+```
+
+This is a list of the **components** that we will use in our application. In React, a component is a UI element that we can create; for example, we can have some Text or a View. Components are meant to be **modular**; they represent some small aspect that can be reused. In addition, a major aspect of components is that they are **combinable**; a `Text` component could reside within a `View` component, for example.
+
+In this list, we put all of the components that we plan to use. Each of the components listed here is a built-in component that React Native provides us. Other components include `Image`, `TextInput`, or `ListView`. We will see these later.
+
+<a id="render"></a>
+### 2.2 `render`
+In this segment of code, we create our first custom component:
+
+```javascript
+var GithubFinder = React.createClass({
+  render: function() {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.welcome}>
+          Welcome to React Native!
+        </Text>
+        <Text style={styles.instructions}>
+          To get started, edit index.ios.js
+        </Text>
+        <Text style={styles.instructions}>
+          Press Cmd+R to reload,{'\n'}
+          Cmd+Control+Z for dev menu
+        </Text>
+      </View>
+    );
+  }
+});
+```
+
+We use the `React.createClass` method, which takes a JSON object containing some functions, to create our custom component. Here, we create a component called `GithubFinder`. This can be viewed the same way as the `Text` or `View` components we saw before, and the same concepts apply; we will see that our `GithubFinder` consists of these very same views.
+
+Inside of this method, we place a single method: `render`. This method takes no arguments, and simply returns the View that we wish to render for the component. In this case, the View we wish to render looks like this:
+
+```javascript
+<View style={styles.container}>
+  <Text style={styles.welcome}>
+    Welcome to React Native!
+  </Text>
+  <Text style={styles.instructions}>
+    To get started, edit index.ios.js
+  </Text>
+  <Text style={styles.instructions}>
+    Press Cmd+R to reload,{'\n'}
+    Cmd+Control+Z for dev menu
+  </Text>
+</View>
+```
+
+For those of you familiar with HTML, this looks quite similar: we have nested tags, each of which has some attributes. This reflects the modularity we hope to achieve with React Native. We can write once, use the attributes of the component, and render many different times.
+
+<a id="styling"></a>
+### 2.3 Styling
+You'll see that on some of our components, there is a `style` attribute. We define these at the bottom of our file:
+
+```javascript
+var styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  welcome: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+  },
+  instructions: {
+    textAlign: 'center',
+    color: '#333333',
+    marginBottom: 5,
+  },
+});
+```
+
+Calling the `StyleSheet.create` function allows us to create lots of different styling rules; think of these as CSS rules, which can define different attributes on the items in question. 
+
+Most of the attributes are pretty self-explanatory: `color`, `textAlign`, `margin`, etc. However, `flex` is one that may be uncommon to some. This is an attribute from [Flexbox][flexbox], which is a method for laying out content within a view; for example, moving one item to the left of another item, or something similar.
+
+From this file-wide `styles` object, we can access all of the different rules we want to use throughout our application. For example, we see we apply `styles.container` to our `View` object that will contain all of our `Text` components.
+
+For those of you that have done Objective-C development, this CSS-like styling is much easier than styling in Interface Builder or something comparable. This will save us a lot of time. In addition, we don't need to reload the entire application to view our styling changes. Try changing `textAlign` to `left` instead of center, then go to the Simulator and press `Cmd-R`; you'll see the text shift without having to reload the entire application. Magic!
+
+<a id="app-registry"></a>
+### 2.4 `AppRegistry`
+Finally, there is a single line at the end of our file:
+
+```javascript
+AppRegistry.registerComponent('GithubFinder', () => GithubFinder);
+```
+
+Our `AppRegistry.registerComponent` method is the way we register our root component. This means that, when the iOS application launches, it will launch our GithubFinder component as the first component that we see when our application starts. Thus, when our application launches, it'll know what to do.This call will generally be the last line of all of our React Native applications, and it is basically just a way to start our application.
+
 
 ___________
 
@@ -244,5 +365,6 @@ While React Native is still a very new technology, there are still lots of quali
 [docs]: http://facebook.github.io/react-native/docs/getting-started.html
 [github-link]: https://github.com/mjp2220/react-native-talk 
 [xcode]: https://developer.apple.com/xcode/downloads/
+[flexbox]: https://css-tricks.com/snippets/css/a-guide-to-flexbox/
 
 
