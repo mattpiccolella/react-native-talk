@@ -111,7 +111,8 @@ Next steps:
 That means we have successfully created our first iOS application using React Native! If you look at the files in our new project folder, you should see something like this:
 
 ```
-GithubFinder.xcodeproj iOS                    index.ios.js           node_modules           package.json
+GithubFinder.xcodeproj iOS index.ios.js
+node_modules package.json
 ```
 
 In a later section, we will explain what each one of these files does, and which of them will be important to us.
@@ -450,15 +451,6 @@ and our application will look as follows:
 ![Custom View](https://dl.dropboxusercontent.com/s/sp5s2goau3ucaa9/first-view.png)
 
 Woohoo! You have now created your first custom view.
-
--   [3.0 Search Bar and Data Retrieval](#build-application)
-    - [3.1 Adding our Search Bar](#search-bar)
-    - [3.2 Delegate Methods](#delegate)
-    - [3.3 Retrieving our Data](#retrieving-data)
--   [4.0 Showing our Results](#results)
-    - [4.1 Creating our List View](#list-view)
-    - [4.2 Creating Each Cell](#cells)
-    - [4.3 Styling Each Cell](#styling-cell)
 
 <a id="build-application"></a>
 ## 3.0 Search Bar and Data Retrieval
