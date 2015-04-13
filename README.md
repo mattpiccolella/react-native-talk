@@ -161,7 +161,8 @@ For us, the simulator is quite simple. To refresh, we simply type `Cmd-R` to rel
 Now that we have our simulator running, let's go back to the structure of the project we created. We saw before that the files contained inside of our project include:
 
 ```
-GithubFinder.xcodeproj iOS                    index.ios.js           node_modules           package.json
+GithubFinder.xcodeproj iOS index.ios.js           
+node_modules package.json
 ```
 
 Let's look at each file:
